@@ -17,7 +17,8 @@ app.use('/home',(req,res) =>{
     res.send('Hello Home');
 });
 
-app.get('/user',(req,res) =>{
+app.get('/hello/:id', (req,res) =>{
+    console.log(req.params,req.query);
     res.send({'name':'Megha','age':22});
 });
 
