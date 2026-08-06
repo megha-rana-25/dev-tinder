@@ -16,3 +16,11 @@ app.use('/megha',(req,res) =>{
 app.use('/home',(req,res) =>{
     res.send('Hello Home');
 });
+
+app.get('/user',(req,res) =>{
+    res.send({'name':'Megha','age':22});
+});
+
+app.post('/user',(req,res) =>{
+    res.send("Sent successfully");
+});
