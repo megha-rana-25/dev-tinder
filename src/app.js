@@ -44,8 +44,22 @@ app.post('/user/login',(req,res) =>{
 });
 
 app.get('/admin/getAllData',(req,res) =>{
+    
+    try{
+        throw new Error('Something went wrong');
+    }       
+    catch(err){
+        res.status(500).send('Contact the helpline number');
+    }
     res.send('All Data');
 });
+
+
+app.use('/',(err,req,res,next)=>{
+    console.error(err.stack);
+    res.status(500).send('Something went wrong');
+});
+
 
 app.delete('/admin/deleteData',(req,res) =>{
     res.send('Data Deleted');
