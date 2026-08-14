@@ -13,12 +13,10 @@ connectDB().then(()=>{
     console.log('Database connection failed',err);
 });
 
+app.use(express.json());
+
 app.post('/signup',async (req,res) =>{
-    const user = new User({
-        firstName:'Yash',
-        lastName:'Jadeja',
-        email:'yash@example.com'
-    });
+    const user = new User(req.body);
     try {await user.save();
         
             res.send('User created successfully');
