@@ -22,9 +22,52 @@ app.post('/signup',async (req,res) =>{
             res.send('User created successfully');
         }
         catch(err){
-            res.status(400).send('Error creating user',err.message);
+            res.status(400).send('Error creating user' + err.message);
         };
 });
+
+app.get('/userByEmailId',async(req,res) =>{
+    const userEmail = req.body.email;
+    try{
+        const user = await User.find({email:userEmail});
+        if(!user.length){
+            res.status(404).send('User not found');
+        }else{
+            res.send(user);
+        }
+        
+    }
+    catch(err){
+        res.status(500).send('Error fetching user',err.message);
+    }
+});
+
+app.get('/users',async(req,res) =>{
+    try{
+        const users = await User.find();
+        res.send(users);
+    }
+    catch(err){
+        res.status(500).send('Error fetching users',err.message);
+    }
+});
+
+app.get('/user/:id',async(req,res) =>{
+    const userId = req.params.id;
+    try{
+        const user = await User.findById(userId);
+        if(!user){
+            res.status(404).send('User not found');
+        }else{
+            res.send(user);
+        }
+    }
+    catch(err){
+        res.status(500).send('Error fetching user',err.message);
+    }
+});
+
+
 
 app.use('/test',(req,res) =>{
     res.send('Hello World');
@@ -84,3 +127,35 @@ app.use('/',(err,req,res,next)=>{
 app.delete('/admin/deleteData',(req,res) =>{
     res.send('Data Deleted');
 });
+
+app.delete('/user',async(req,res) =>{
+    const userId = req.body.userId;
+    try{
+        const user = await User.findByIdAndDelete(userId);
+        res.send('User deleted successfully');
+    }catch(err){
+        res.status(500).send('Error deleting user',err.message);
+    }
+})
+
+app.patch('/user',async(req,res) =>{
+    const userId = req.body.userId;
+    try{
+        await User.findByIdAndUpdate(userId,req.body,{runValidators:true});
+        res.send('User updated successfully');
+    }catch(err){
+        res.status(500).send('Error updating user' 
+            + err.message);
+    }
+});
+
+// app.patch('/user',async(req,res) =>{
+//     console.log("2");
+//     const emailId = req.body.email;
+//     try{
+//         await User.findOneAndUpdate({email: emailId}, req.body);
+//         res.send('User updated successfully');
+//     }catch(err){
+//         res.status(500).send('Error updating user',err.message);
+//     }
+// });
