@@ -3,6 +3,8 @@ const app = express();
 const {adminAuth,userAuth} = require('./middlewares/auth');
 const connectDB = require('./config/database');
 const User = require('./config/models/user');
+const validateUser = require('./utils/validation');
+const bcrypt = require('bcrypt');
 
 connectDB().then(()=>{
     console.log('Database connected');
@@ -16,13 +18,28 @@ connectDB().then(()=>{
 app.use(express.json());
 
 app.post('/signup',async (req,res) =>{
-    const user = new User(req.body);
-    try {await user.save();
-        
-            res.send('User created successfully');
+    try {
+        // Validate the user
+        validateUser(req.body);
+
+        const {firstName,lastName,email,password,age,gender,about} = req.body;
+
+        // Encrypt the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        age,
+        gender,
+        about
+    });
+        await user.save();
+        res.send('User created successfully');
         }
         catch(err){
-            res.status(400).send('Error creating user' + err.message);
+        res.status(400).send('Error creating user: ' + err.message);
         };
 });
 
