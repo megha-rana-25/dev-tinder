@@ -1,10 +1,12 @@
 const express = require('express');
 const app = express();
-const {adminAuth,userAuth} = require('./middlewares/auth');
+const {adminAuth,userAuth,auth} = require('./middlewares/auth');
 const connectDB = require('./config/database');
 const User = require('./config/models/user');
 const validateUser = require('./utils/validation');
 const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 connectDB().then(()=>{
     console.log('Database connected');
@@ -16,6 +18,7 @@ connectDB().then(()=>{
 });
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.post('/signup',async (req,res) =>{
     try {
@@ -42,6 +45,41 @@ app.post('/signup',async (req,res) =>{
         res.status(400).send('Error creating user: ' + err.message);
         };
 });
+
+app.post('/login',async (req,res)=>{
+    try{
+        const {email, password} = req.body;
+        
+        if(!email || !password){
+            throw new Error('Email and password are required');
+        }
+
+        const user = await User.findOne({email});
+        if(!user){
+            throw new Error('Invalid credentials');
+        }
+
+        const isPasswordValid = await bcrypt.compare(password,user.password);
+        if(!isPasswordValid){
+            throw new Error('Invalid credentials');
+        }else{
+            const token = await jwt.sign({id:user._id},'secretKey',{expiresIn:'0h'});
+            res.cookie('token',token,{httpOnly:true});
+            res.send('User logged in successfully');
+        }
+
+    }catch(err){
+        res.status(400).send('Error logging in: ' + err.message);
+    }
+})
+
+app.get('/profile',auth, async (req,res) =>{
+    try{
+    res.send(req.user);
+}catch(err){
+    res.status(400).send('Error fetching profile: ' + err.message);
+}
+})
 
 app.get('/userByEmailId',async(req,res) =>{
     const userEmail = req.body.email;
