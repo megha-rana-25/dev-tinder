@@ -21,7 +21,7 @@ const auth = async(req,res,next) =>{
     console.log('Decoded token:', decoded);
     const {id} = decoded;
     console.log('Decoded user ID:', id);
-    const user = await User.findById(id);
+    const user = await User.findById(id).select('-password');
     if(!user){
         throw new Error('Unauthorized: User not found');
     }else{

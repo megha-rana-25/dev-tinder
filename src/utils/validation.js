@@ -10,4 +10,14 @@ const validateUser = (body) =>{
     }
 }
 
-module.exports = validateUser;
+const validateProfileUpdateData = (body) =>{
+    allowedFields = ["firstName", "lastName","email","age","about","gender"];
+    return Object.keys(body).every(key =>
+    allowedFields.includes(key)
+    );
+}
+
+module.exports = {
+    validateUser,
+    validateProfileUpdateData
+};
