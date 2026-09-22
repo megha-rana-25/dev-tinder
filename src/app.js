@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
 const profileRouter = require('./routes/profile');
+const connectionRequestRouter = require('./routes/connectionRequest');
 
 connectDB().then(()=>{
     console.log('Database connected');
@@ -22,6 +23,7 @@ app.use(cookieParser());
 app.use('/',authRouter);
 app.use('/',userRouter);
 app.use('/',profileRouter);
+app.use('/',connectionRequestRouter);
 
 app.use('/test',(req,res) =>{
     res.send('Hello World');
@@ -36,7 +38,6 @@ app.use('/home',(req,res) =>{
 });
 
 app.get('/hello/:id', (req,res) =>{
-    console.log(req.params,req.query);
     res.send({'name':'Megha','age':22});
 });
 

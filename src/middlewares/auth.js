@@ -16,11 +16,8 @@ const auth = async(req,res,next) =>{
     if(!token){
         throw new Error('Unauthorized: No token provided');
     }
-    console.log('Token:', token);
     const decoded = await jwt.verify(token,'secretKey');
-    console.log('Decoded token:', decoded);
     const {id} = decoded;
-    console.log('Decoded user ID:', id);
     const user = await User.findById(id).select('-password');
     if(!user){
         throw new Error('Unauthorized: User not found');

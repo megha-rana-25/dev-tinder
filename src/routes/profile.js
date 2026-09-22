@@ -37,7 +37,7 @@ profileRouter.post('/profile/forgot-password', async (req,res) =>{
             });
         }
         const token = crypto.randomBytes(32).toString('hex');
-        console.log('Generated reset token:', token);
+        console.log('Generated token:', token);
 
         //hash the token and save it to the user document
         user.resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
@@ -57,7 +57,7 @@ profileRouter.patch('/profile/password',async(req,res) =>{
     try{
         const {token,newPassword} = req.body;   
         hashToken = crypto.createHash('sha256').update(token).digest('hex');
-        console.log('Hashed reset token:', hashToken);
+        
         const user = await User.findOne({
             resetPasswordToken: hashToken,
             resetPasswordExpires: {$gt: Date.now()}
