@@ -52,6 +52,10 @@ userRouter.get('/user/connections',auth,async(req,res) =>{
 
 userRouter.get('/user/feed',auth,async(req,res) =>{
     try{
+        const page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 10;
+        limit = limit > 50 ? 10 : limit;
+        const skip = (page - 1) * limit;
         const connections = await ConnectionRequest.find({
             $or:[{fromUserId:req.user.id},{toUserId: req.user.id}]
         }).select('fromUserId toUserId');
@@ -68,7 +72,7 @@ userRouter.get('/user/feed',auth,async(req,res) =>{
                 {_id: {$nin: [...connectedUserIds]}},
                 {_id: {$ne: req.user.id}}
             ]
-        }).select('firstName lastName');
+        }).select('firstName lastName').skip(skip).limit(limit);
         
         res.json({message: 'Data fetched successfully', data: users});
     }
